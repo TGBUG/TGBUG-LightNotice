@@ -1,0 +1,18 @@
+name: TGBUG-LightNotice
+version: '1.0.0'
+main: TGBUG.tgbug_lightnotice.TGBUG_LightNotice
+api-version: '1.20'
+load: STARTUP
+depend: [PlaceholderAPI]
+commands:
+  lightnotice:
+    description: "插件主命令"
+    usage: "/<command> [reload|view]"
+    aliases: ln
+    children:
+      reload:
+        description: 重新加载配置文件
+        usage: "/<command> reload"
+      view:
+        description: 输出指定的广播
+        usage: "/<command> view [广播名]"

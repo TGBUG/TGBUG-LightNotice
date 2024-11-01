@@ -1,0 +1,8 @@
+random_messages:
+    - example:
+        - "first line"
+        - "支持多行"
+        - "%server_uptime%支持placeholderAPI"
+        - "&c支持彩色文本"
+    - example1:
+        - "支持多文本"

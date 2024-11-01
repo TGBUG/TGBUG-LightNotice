@@ -1,0 +1,8 @@
+#是否将随机广播与固定广播合并
+merge_random_notice: true
+#每隔几个固定广播广播一个随机广播
+random_notice_interval: 2
+#广播间隔（单位：秒）
+period: 600
+#随机广播间隔（仅当上方合并随机广播为true才会生效）
+random_period: 600
