@@ -51,8 +51,19 @@ public class MessageBroadcaster {
 
             @Override
             public void run() {
+                // 检查是否达到随机消息广播的间隔
+                if (randomMessageCounter >= configManager.getRandom_notice_interval()) {
+                    // 随机广播 random_messages.yml 内容
+                    List<String> randomMessage = getRandomMessage(randomMessagesList);
+                    if (randomMessage != null) {
+                        for (String line : randomMessage) {
+                            sendMessageToAll(line);
+                        }
+                    }
+                    randomMessageCounter = 0;
+                }
                 // 广播 messages.yml 内容
-                if (messageIndex < messagesList.size()) {
+                else if (messageIndex < messagesList.size()) {
                     Map<?, ?> messageMap = messagesList.get(messageIndex);
                     for (Object key : messageMap.keySet()) {
                         List<String> messages = configManager.getMessage(messagesList, key.toString(), null);
@@ -64,18 +75,6 @@ public class MessageBroadcaster {
                     }
                     messageIndex++;
                     randomMessageCounter++;
-
-                    // 检查是否达到随机消息广播的间隔
-                    if (randomMessageCounter >= configManager.getRandom_notice_interval()) {
-                        // 随机广播 random_messages.yml 内容
-                        List<String> randomMessage = getRandomMessage(randomMessagesList);
-                        if (randomMessage != null) {
-                            for (String line : randomMessage) {
-                                sendMessageToAll(line);
-                            }
-                        }
-                        randomMessageCounter = 0;
-                    }
                 } else {
                     messageIndex = 0;
                 }
@@ -104,7 +103,7 @@ public class MessageBroadcaster {
                     }
                     messageIndex++;
                 } else {
-                    messageIndex = 0; // Reset the index
+                    messageIndex = 0;
                 }
             }
         }.runTaskTimer(plugin, configManager.getPeriod() * 20, configManager.getPeriod() * 20);

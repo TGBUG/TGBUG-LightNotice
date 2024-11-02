@@ -6,5 +6,5 @@ merge_random_notice: true
 random_notice_interval: 2
 #广播间隔（单位：秒）
 period: 600
-#随机广播间隔（仅当上方合并随机广播为true才会生效）
+#随机广播间隔（仅当上方合并随机广播为false才会生效）
 random_period: 600
