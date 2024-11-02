@@ -55,7 +55,7 @@ public class MessageBroadcaster {
                 if (messageIndex < messagesList.size()) {
                     Map<?, ?> messageMap = messagesList.get(messageIndex);
                     for (Object key : messageMap.keySet()) {
-                        List<String> messages = configManager.getMessage(messagesList, key.toString(), null); // 传递 null
+                        List<String> messages = configManager.getMessage(messagesList, key.toString(), null);
                         if (messages != null) {
                             for (String line : messages) {
                                 sendMessageToAll(line);

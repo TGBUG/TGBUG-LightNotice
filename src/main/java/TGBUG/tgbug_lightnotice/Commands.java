@@ -2,15 +2,13 @@ package TGBUG.tgbug_lightnotice;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Commands implements CommandExecutor{
+public class Commands implements CommandExecutor, TabCompleter {
     private final ConfigManager configManager;
     private final MessageBroadcaster messageBroadcaster;
 
@@ -61,6 +59,44 @@ public class Commands implements CommandExecutor{
             }
         }
         return true;
+    }
+
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        List<String> completions = new ArrayList<>();
+
+        if (args.length == 1) {
+            completions.add("reload");
+            completions.add("view");
+        } else if (args.length == 2) {
+            switch (args[0].toLowerCase()) {
+                case "reload":
+                    break;
+                case "view":
+                    completions.add("messages");
+                    completions.add("random_messages");
+                    break;
+            }
+        } else if (args.length == 3) {
+            switch (args[1].toLowerCase()) {
+                case "messages":
+                    List<Map<?, ?>> messagesList = configManager.getMessagesList();
+                    for (Map<?, ?> message : messagesList) {
+                        for (Object key : message.keySet()) {
+                            completions.add(key.toString());
+                        }
+                    }
+                    break;
+                case "random_messages":
+                    List<Map<?, ?>> randomMessagesList = configManager.getRandomMessagesList();
+                    for (Map<?, ?> message : randomMessagesList) {
+                        for (Object key : message.keySet()) {
+                            completions.add(key.toString());
+                        }
+                    }
+                    break;
+            }
+        }
+        return completions;
     }
 
     private boolean command_messages(CommandSender sender, String specifiedKey, List<Map<?, ?>> messagesList) {
