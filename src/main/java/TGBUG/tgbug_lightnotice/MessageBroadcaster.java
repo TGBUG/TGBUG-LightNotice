@@ -129,7 +129,7 @@ public class MessageBroadcaster {
         int randomIndex = random.nextInt(randomMessagesList.size());
         Map<?, ?> randomMessageMap = randomMessagesList.get(randomIndex);
         for (Object key : randomMessageMap.keySet()) {
-            return (List<String>) randomMessageMap.get(key);
+            return configManager.getMessage(randomMessagesList, key.toString(), null);
         }
         return null;
     }
