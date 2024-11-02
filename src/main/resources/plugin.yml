@@ -1,5 +1,5 @@
 name: TGBUG-LightNotice
-version: '1.0.0'
+version: '1.0'
 main: TGBUG.tgbug_lightnotice.TGBUG_LightNotice
 api-version: '1.20'
 load: STARTUP
