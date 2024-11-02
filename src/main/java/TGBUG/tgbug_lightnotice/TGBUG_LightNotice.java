@@ -6,15 +6,16 @@ public final class TGBUG_LightNotice extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
-        ConfigManager configManager = new ConfigManager(this);
+        // 初始化部分
+        ConfigManager configManager = new ConfigManager(this).loadconfig();
+        MessageBroadcaster messageBroadcaster = new MessageBroadcaster(this, configManager);
+        this.getCommand("lightnotice").setExecutor(new Commands(configManager, messageBroadcaster));
+        this.getCommand("lightnotice").setTabCompleter(new Commands(configManager, messageBroadcaster));
+        // 启动bStats和广播任务
         configManager.loadconfig();
         if (configManager.isBStats()) {
             Metrics metrics = new Metrics(this, 23788);
         }
-        this.getCommand("lightnotice").setExecutor(new Commands(this));
-        this.getCommand("lightnotice").setTabCompleter(new Commands(this));
-        MessageBroadcaster messageBroadcaster = new MessageBroadcaster(this);
         messageBroadcaster.startBroadcasting();
     }
 

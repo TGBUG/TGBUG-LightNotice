@@ -9,13 +9,12 @@ import java.util.List;
 import java.util.Map;
 
 public class Commands implements CommandExecutor, TabCompleter {
-    private final ConfigManager configManager;
+    private ConfigManager configManager;
     private final MessageBroadcaster messageBroadcaster;
 
-    public Commands(TGBUG_LightNotice plugin) {
-        this.configManager = new ConfigManager(plugin);
-        this.configManager.loadconfig();
-        this.messageBroadcaster = new MessageBroadcaster(plugin);
+    public Commands(ConfigManager configManager, MessageBroadcaster messageBroadcaster) {
+        this.configManager = configManager;
+        this.messageBroadcaster = messageBroadcaster;
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -25,7 +24,7 @@ public class Commands implements CommandExecutor, TabCompleter {
             switch (args[0].toLowerCase()) {
                 case "reload":
                     messageBroadcaster.stopBroadcasts();
-                    configManager.loadconfig();
+                    configManager = configManager.loadconfig();
                     messageBroadcaster.startBroadcasting();
                     sender.sendMessage("配置文件已重新加载！");
                     return true;

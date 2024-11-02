@@ -27,7 +27,7 @@ public class ConfigManager {
         this.plugin = plugin;
     }
 
-    public void loadconfig() {
+    public ConfigManager loadconfig() {
         File configFile = new File(plugin.getDataFolder(), "config.yml");
         File messagesFile = new File(plugin.getDataFolder(), "messages.yml");
         File random_messagesFile = new File(plugin.getDataFolder(), "random_messages.yml");
@@ -50,6 +50,9 @@ public class ConfigManager {
         bStats = config.getBoolean("bStats");
         messagesList = messages.getMapList("messages");
         random_messagesList = random_messages.getMapList("random_messages");
+
+        //回传实例
+        return this;
     }
 
     //回传变量

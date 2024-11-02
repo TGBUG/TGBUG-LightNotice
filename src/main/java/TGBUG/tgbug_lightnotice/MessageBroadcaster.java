@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class MessageBroadcaster {
     private final TGBUG_LightNotice plugin;
-    private final ConfigManager configManager;
+    private ConfigManager configManager;
     private final Random random = new Random();
     private List<Map<?, ?>> messagesList;
     private List<Map<?, ?>> randomMessagesList;
@@ -21,13 +21,13 @@ public class MessageBroadcaster {
     private BukkitTask messagesBroadcastTask;
     private BukkitTask randomMessagesBroadcastTask;
 
-    public MessageBroadcaster(TGBUG_LightNotice plugin) {
+    public MessageBroadcaster(TGBUG_LightNotice plugin, ConfigManager configManager) {
         this.plugin = plugin;
-        this.configManager = new ConfigManager(plugin);
+        this.configManager = configManager;
     }
 
     public void startBroadcasting() {
-        configManager.loadconfig();
+        configManager = configManager.loadconfig();
         messagesList = configManager.getMessagesList();
         randomMessagesList = configManager.getRandomMessagesList();
         if (configManager.isMerge_random_notice()) {
