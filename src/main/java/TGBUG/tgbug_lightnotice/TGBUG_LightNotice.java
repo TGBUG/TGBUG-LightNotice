@@ -16,7 +16,6 @@ public final class TGBUG_LightNotice extends JavaPlugin {
         this.getCommand("lightnotice").setTabCompleter(new Commands(this));
         MessageBroadcaster messageBroadcaster = new MessageBroadcaster(this);
         messageBroadcaster.startBroadcasting();
-
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
 import java.util.List;
@@ -82,6 +83,7 @@ public class ConfigManager {
 
     // 获取消息
     public List<String> getMessage(List<Map<?, ?>> messagesList, String specifiedKey, OfflinePlayer p) {
+        PluginManager pluginManager = plugin.getServer().getPluginManager();
         for (Map<?, ?> messagesMap : messagesList) {
             if (messagesMap.containsKey(specifiedKey)) {
                 // 获取指定键的值（List<String>）
@@ -91,7 +93,9 @@ public class ConfigManager {
                     // 替换颜色代码
                     message = ChatColor.translateAlternateColorCodes('&', message);
                     // 替换占位符
-                    message = PlaceholderAPI.setPlaceholders(p, message);
+                    if (pluginManager.isPluginEnabled("PlaceholderAPI")) {
+                        message = PlaceholderAPI.setPlaceholders(p, message);
+                    }
                     messages.set(i, message);
                 }
                 return messages;
