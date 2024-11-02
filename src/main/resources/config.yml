@@ -1,3 +1,5 @@
+#是否允许bStats收集数据（重启生效）
+bStats: true
 #是否将随机广播与固定广播合并
 merge_random_notice: true
 #每隔几个固定广播广播一个随机广播

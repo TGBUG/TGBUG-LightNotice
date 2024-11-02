@@ -20,6 +20,7 @@ public class ConfigManager {
     private List<Map<?, ?>> messagesList;
     private List<Map<?, ?>> random_messagesList;
     private int random_notice_interval;
+    private boolean bStats;
 
     public ConfigManager(TGBUG_LightNotice plugin) {
         this.plugin = plugin;
@@ -45,6 +46,7 @@ public class ConfigManager {
         period = config.getLong("period");
         random_period = config.getLong("random_period");
         random_notice_interval = config.getInt("random_notice_interval");
+        bStats = config.getBoolean("bStats");
         messagesList = messages.getMapList("messages");
         random_messagesList = random_messages.getMapList("random_messages");
     }
@@ -64,6 +66,10 @@ public class ConfigManager {
 
     public int getRandom_notice_interval() {
         return random_notice_interval;
+    }
+
+    public boolean isBStats() {
+        return bStats;
     }
 
     public List<Map<?, ?>> getMessagesList() {

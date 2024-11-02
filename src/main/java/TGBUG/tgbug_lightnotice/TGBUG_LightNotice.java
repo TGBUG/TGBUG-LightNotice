@@ -9,6 +9,9 @@ public final class TGBUG_LightNotice extends JavaPlugin {
         // Plugin startup logic
         ConfigManager configManager = new ConfigManager(this);
         configManager.loadconfig();
+        if (configManager.isBStats()) {
+            Metrics metrics = new Metrics(this, 23788);
+        }
         this.getCommand("lightnotice").setExecutor(new Commands(this));
         MessageBroadcaster messageBroadcaster = new MessageBroadcaster(this);
         messageBroadcaster.startBroadcasting();
