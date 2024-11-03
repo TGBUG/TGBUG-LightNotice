@@ -1,0 +1,11 @@
+#更高级的广播模式，结构有所不同
+timed_messages:
+    - example:
+          delay: 600 #设置每一个广播的广播间隔
+          messages:
+              - "此处编写方法与其他无异"
+    - example1:
+          delay: 300
+          messages:
+              - "同样支持PlaceHolderAPI等"
+              - "%server_uptime"

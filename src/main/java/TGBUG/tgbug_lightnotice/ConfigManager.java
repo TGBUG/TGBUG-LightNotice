@@ -1,11 +1,10 @@
 package TGBUG.tgbug_lightnotice;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
@@ -20,6 +19,7 @@ public class ConfigManager {
     private Long random_period;
     private List<Map<?, ?>> messagesList;
     private List<Map<?, ?>> random_messagesList;
+    private List<Map<?, ?>> timed_MessageList;
     private int random_notice_interval;
     private boolean bStats;
 
@@ -31,10 +31,12 @@ public class ConfigManager {
         File configFile = new File(plugin.getDataFolder(), "config.yml");
         File messagesFile = new File(plugin.getDataFolder(), "messages.yml");
         File random_messagesFile = new File(plugin.getDataFolder(), "random_messages.yml");
+        File timed_messagesFile = new File(plugin.getDataFolder(), "timed_messages.yml");
 
         checkConfigFile.checkConfigFile(configFile, plugin);
         checkConfigFile.checkConfigFile(messagesFile, plugin);
         checkConfigFile.checkConfigFile(random_messagesFile, plugin);
+        checkConfigFile.checkConfigFile(timed_messagesFile, plugin);
 
 
         //加载配置文件完毕，获取变量部分
@@ -42,6 +44,7 @@ public class ConfigManager {
         FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         FileConfiguration messages = YamlConfiguration.loadConfiguration(messagesFile);
         FileConfiguration random_messages = YamlConfiguration.loadConfiguration(random_messagesFile);
+        FileConfiguration timed_messages = YamlConfiguration.loadConfiguration(timed_messagesFile);
 
         isMerge_random_notice = config.getBoolean("merge_random_notice");
         period = config.getLong("period");
@@ -50,6 +53,7 @@ public class ConfigManager {
         bStats = config.getBoolean("bStats");
         messagesList = messages.getMapList("messages");
         random_messagesList = random_messages.getMapList("random_messages");
+        timed_MessageList = timed_messages.getMapList("timed_messages");
 
         //回传实例
         return this;
@@ -84,26 +88,36 @@ public class ConfigManager {
         return random_messagesList;
     }
 
+    public List<Map<?, ?>> getTimedMessagesList() {
+        return timed_MessageList;
+    }
+
     // 获取消息
     public List<String> getMessage(List<Map<?, ?>> messagesList, String specifiedKey, OfflinePlayer p) {
-        PluginManager pluginManager = plugin.getServer().getPluginManager();
+
         for (Map<?, ?> messagesMap : messagesList) {
             if (messagesMap.containsKey(specifiedKey)) {
                 // 获取指定键的值（List<String>）
                 List<String> messages = (List<String>) messagesMap.get(specifiedKey);
-                for (int i = 0; i < messages.size(); i++) {
-                    String message = messages.get(i);
-                    // 替换颜色代码
-                    message = ChatColor.translateAlternateColorCodes('&', message);
-                    // 替换占位符
-                    if (pluginManager.isPluginEnabled("PlaceholderAPI")) {
-                        message = PlaceholderAPI.setPlaceholders(p, message);
-                    }
-                    messages.set(i, message);
-                }
-                return messages;
+                //转换消息
+                return translateMessage(messages, p);
             }
         }
         return null;
+    }
+
+    public List<String> translateMessage(List<String> messages, OfflinePlayer p) {
+        PluginManager pluginManager = plugin.getServer().getPluginManager();
+        for (int i = 0; i < messages.size(); i++) {
+            String message = messages.get(i);
+            // 替换颜色代码
+            message = ChatColor.translateAlternateColorCodes('&', message);
+            // 替换占位符
+            if (pluginManager.isPluginEnabled("PlaceholderAPI")) {
+                message = PlaceholderAPI.setPlaceholders(p, message);
+            }
+            messages.set(i, message);
+        }
+        return messages;
     }
 }

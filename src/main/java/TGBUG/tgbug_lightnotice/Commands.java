@@ -2,7 +2,11 @@ package TGBUG.tgbug_lightnotice;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +54,34 @@ public class Commands implements CommandExecutor, TabCompleter {
                                 sender.sendMessage("使用方法: /ln view [广播类型] [广播名]");
                             }
                             return true;
+
+                        case "timed_messages":
+                            if (args.length == 3) {
+                                String specifiedKey = args[2];
+                                List<Map<?, ?>> messagesList = configManager.getTimedMessagesList();
+                                //此处不能再用command_messages方法，重写
+                                if (messagesList == null) {
+                                    sender.sendMessage("消息列表未加载，请检查配置。");
+                                    return true;
+                                }
+                                OfflinePlayer player;
+                                if (sender instanceof Player) {
+                                    player = Bukkit.getOfflinePlayer(sender.getName());
+                                } else {
+                                    player = Bukkit.getOfflinePlayer("Console");
+                                }
+                                for (Map<?, ?> messagesMap : messagesList) {
+                                    if (messagesMap.containsKey(specifiedKey)) {
+                                        Map<String, Object> details = (Map<String, Object>) messagesMap.get(specifiedKey);
+                                        for (String line : configManager.translateMessage((List<String>) details.get("messages"), player)) {
+                                            sender.sendMessage(line);
+                                        }
+                                    }
+                                }
+                            } else {
+                                sender.sendMessage("使用方法: /ln view [广播类型] [广播名]");
+                            }
+                            return true;
                     }
 
                 default:
@@ -73,6 +105,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                 case "view":
                     completions.add("messages");
                     completions.add("random_messages");
+                    completions.add("timed_messages");
                     break;
             }
         } else if (args.length == 3) {
@@ -93,6 +126,13 @@ public class Commands implements CommandExecutor, TabCompleter {
                         }
                     }
                     break;
+                case "timed_messages":
+                    List<Map<?, ?>> timedMessagesList = configManager.getTimedMessagesList();
+                    for (Map<?, ?> message : timedMessagesList) {
+                        for (Object key : message.keySet()) {
+                            completions.add(key.toString());
+                        }
+                    }
             }
         }
         return completions;
@@ -105,10 +145,10 @@ public class Commands implements CommandExecutor, TabCompleter {
         }
         OfflinePlayer player;
 
-        if (sender instanceof ConsoleCommandSender) {
-            player = Bukkit.getOfflinePlayer("Console");
-        } else {
+        if (sender instanceof Player) {
             player = Bukkit.getOfflinePlayer(sender.getName());
+        } else {
+            player = Bukkit.getOfflinePlayer("Console");
         }
 
         List<String> message = configManager.getMessage(messagesList, specifiedKey, player);

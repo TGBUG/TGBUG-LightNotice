@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -16,10 +16,12 @@ public class MessageBroadcaster {
     private final Random random = new Random();
     private List<Map<?, ?>> messagesList;
     private List<Map<?, ?>> randomMessagesList;
+    private List<Map<?, ?>> timedMessagesList;
 
     private BukkitTask broadcastTask;
     private BukkitTask messagesBroadcastTask;
     private BukkitTask randomMessagesBroadcastTask;
+    private List<BukkitTask> timedMessagesBroadcastTasks = new ArrayList<>();
 
     public MessageBroadcaster(TGBUG_LightNotice plugin, ConfigManager configManager) {
         this.plugin = plugin;
@@ -30,11 +32,13 @@ public class MessageBroadcaster {
         configManager = configManager.loadconfig();
         messagesList = configManager.getMessagesList();
         randomMessagesList = configManager.getRandomMessagesList();
+        timedMessagesList = configManager.getTimedMessagesList();
         if (configManager.isMerge_random_notice()) {
             startMergedBroadcast();
         } else {
             startSeparateBroadcasts();
         }
+        startTimedBroadcasts();
     }
 
     private void sendMessageToAll(String message) {
@@ -44,6 +48,7 @@ public class MessageBroadcaster {
         plugin.getLogger().info(message);
     }
 
+    //合并广播部分
     private void startMergedBroadcast() {
         broadcastTask = new BukkitRunnable() {
             int messageIndex = 0;
@@ -82,8 +87,7 @@ public class MessageBroadcaster {
         }.runTaskTimer(plugin, configManager.getPeriod() * 20, configManager.getPeriod() * 20);
     }
 
-
-
+    //单独任务广播部分
     private void startSeparateBroadcasts() {
         // 启动 messages.yml 的广播
         messagesBroadcastTask = new BukkitRunnable() {
@@ -122,6 +126,33 @@ public class MessageBroadcaster {
         }.runTaskTimer(plugin, configManager.getRandom_period() * 20, configManager.getRandom_period() * 20);
     }
 
+    //定时广播部分
+    private void startTimedBroadcasts() {
+        for (Map<?, ?> entry : timedMessagesList) {
+            for (Object key : entry.keySet()) {
+                Map<String, Object> details = (Map<String, Object>) entry.get(key);
+                if (details.get("delay") instanceof Number) {
+                    long delay = ((Number) details.get("delay")).longValue();
+
+                    BukkitTask timedMessagesBroadcastTask = new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            List<String> timed_messages = configManager.translateMessage((List<String>) details.get("messages"), null);
+                            if (timed_messages != null) {
+                                for (String line : timed_messages) {
+                                    sendMessageToAll(line);
+                                }
+                            }
+                        }
+                    }.runTaskTimer(plugin, delay * 20, delay * 20);
+                    timedMessagesBroadcastTasks.add(timedMessagesBroadcastTask);
+                } else {
+                    plugin.getLogger().warning("timed_messages中有delay的值无效");
+                    plugin.getLogger().warning("已取消注册此广播任务");
+                }
+            }
+        }
+    }
 
     private List<String> getRandomMessage(List<Map<?, ?>> randomMessagesList) {
         if (randomMessagesList.isEmpty()) return null;
@@ -146,6 +177,12 @@ public class MessageBroadcaster {
         if (randomMessagesBroadcastTask != null) {
             randomMessagesBroadcastTask.cancel();
             randomMessagesBroadcastTask = null;
+        }
+        if (timedMessagesBroadcastTasks != null) {
+            for (BukkitTask timedMessagesBroadcastTask : timedMessagesBroadcastTasks) {
+                timedMessagesBroadcastTask.cancel();
+            }
+            timedMessagesBroadcastTasks = new ArrayList<>();
         }
     }
 
